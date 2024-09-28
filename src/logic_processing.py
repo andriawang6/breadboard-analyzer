@@ -63,9 +63,7 @@ def create_relationships(endpoints, row_bindings, middle):
             i += 1
 
         # if char is a Y, then the var is an output
-        if pin[i] == "Y":
-            return True
-        return False
+        return pin[i] == "Y"
     
     connections = []
     inputs = set()

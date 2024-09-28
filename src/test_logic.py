@@ -1,4 +1,5 @@
 import logic_processing
+import linearization
 
 MIDDLE = 5.5
 
@@ -57,14 +58,17 @@ endpoints = [[(4, 0), (4, 3)],
              [(0, 6), [0, 13]]]
 
 
-print("test bind_rows()")
+# print("test bind_rows()")
 result = logic_processing.bind_rows(chip_coords, chip_info, MIDDLE)
-for key in row_binds:
-    if result[key] != row_binds[key]:
-        print(f"{result[key]}, {row_binds[key]}, {key}")
+# for key in row_binds:
+#     if result[key] != row_binds[key]:
+#         print(f"{result[key]}, {row_binds[key]}, {key}")
 
-print("test create_relationships()")
+# print("test create_relationships()")
 c, i, o = logic_processing.create_relationships(endpoints, result, MIDDLE)
-print(c)
-print(list(i))
-print(list(o))
+# print(c)
+# print(list(i))
+# print(list(o))
+
+adj = linearization.generate_adjacency_map(c, i, o)
+print(adj)
