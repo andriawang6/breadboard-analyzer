@@ -1,6 +1,6 @@
 # given input: chip coords and chip info
 # created output: row bindings 
-# take chip-coordinate and make a map storing "row#side : pin&chip"
+# take chip-coordinate and make a map storing "row#side : pin_chip"
 def bind_rows(chip_coords, chip_info, middle):
     # row_binds maps row#side : pin&chip
     row_binds = {}
@@ -18,11 +18,11 @@ def bind_rows(chip_coords, chip_info, middle):
         for i in range(1, 15):
             # determine row and side of coord
             side, row = curr_chip[i]
-            row_side = str(row)
+            row_side = str(row) 
             row_side += "L" if side < middle else "R"
 
             # bind row_side to the pin+chip
-            row_binds[row_side] = curr_chip_info[i - 1] + chip_key
+            row_binds[row_side] = curr_chip_info[i] + "_" + chip_key
 
             # print(f"{row_side} -> {row_binds[row_side]}")
     return row_binds
@@ -31,24 +31,61 @@ def bind_rows(chip_coords, chip_info, middle):
 # created output: relationships
 # take coords and map coordinate to pin 
 # coords are (x, y) --> side is determined by x, row is determined by y
-variables = {}
-def create_relationships(endpoints, row_bindings, middle, variables):
-    def get_binding(coord):
-        side, row = coord[0], coord[1]
+def create_relationships(endpoints, row_bindings, middle):
+    var_binding = {}
+    vars = set()
+
+    # given a coordinate, gets the pin_chip, or creates a var if it does not correspond to a pin
+    def get_binding(coord, vars):
+        # determine row#side, and use it to determine pin_chip
+        side, row = coord
         side = "R" if side > middle else "L"
         key = str(row) + side
+        # if the row#side is not bound to a pin_chip, then it is a var
         binding = row_bindings.get(key, key)
 
-        # if key is not a valid key in row_bindings, add it to variables
+        # if the row#side is a var, add it to vars
         if binding == key:
-            variables[key] = variables.get(key, chr(65 + len(variables)))
-            return variables[key]
+            # also add row#side : var_name to var_binding, if it is not already in var_binding
+            var_binding[key] = var_binding.get(key, chr(65 + len(var_binding)))
+            # add var_name to set of vars
+            vars.add(var_binding[key])
+            return var_binding[key]
         return binding
     
-    bindings = []
-    for start, stop in endpoints:
-        start = get_binding(start)
-        stop = get_binding(stop)
-        bindings.append((start, stop))
+    def check_output(var, pin):
+        # find index before underscore
+        i = 0 
+        for char in pin:
+            if char == "_":
+                i -= 1
+                break
+            i += 1
 
-    return bindings, variables
+        # if char is a Y, then the var is an output
+        if pin[i] == "Y":
+            return True
+        return False
+    
+    connections = []
+    inputs = set()
+    outputs = set()
+    for start, stop in endpoints:
+        start = get_binding(start, vars)
+        stop = get_binding(stop, vars)
+
+        # if start is a var, determine if it is an input or an output
+        if start in vars and start not in inputs and start not in outputs:
+            if check_output(start, stop):
+                outputs.add(start)
+            else:
+                inputs.add(start)
+        # if stop is a var, determine if it is an input or an output
+        elif stop in vars and stop not in inputs and stop not in outputs:
+            if check_output(stop, start):
+                outputs.add(stop)
+            else:
+                inputs.add(stop)
+        connections.append((start, stop))
+
+    return connections, inputs, outputs
