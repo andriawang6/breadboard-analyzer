@@ -58,11 +58,12 @@ endpoints = [[(4, 0), (4, 3)],
 
 
 print("test bind_rows()")
-result = logic_processing.bind_rows(chip_coords, chip_info)
+result = logic_processing.bind_rows(chip_coords, chip_info, MIDDLE)
 for key in row_binds:
     if result[key] != row_binds[key]:
         print(f"{result[key]}, {row_binds[key]}, {key}")
 
-b, v = logic_processing.create_relationships(endpoints, result, 5.5, {})
+print("test create_relationships()")
+b, v = logic_processing.create_relationships(endpoints, result, MIDDLE, {})
 print(b)
 print(v)
