@@ -196,8 +196,8 @@ def crop_grids(image):
     cv2.rectangle(threshold_image,(x,y),(x+w,y+h),(255,0,0),2)
 
     # Show result
-    plt.imshow(threshold_image)
-    plt.show()
+    # plt.imshow(threshold_image)
+    # plt.show()
 
     corners = detect_corners_from_contour(cnv, largest_contour)
 
@@ -265,30 +265,41 @@ def detect_chips(image):
     plt.imshow(image)
     plt.show()
     return chips
-    
 
-def detect_wires(image, min_width=25, max_width=70, min_length=180, max_length=10000):
+
+def detect_wires(image, min_width=20, max_width=100, min_length=200, max_length=10000):
+    # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (7, 7), 0) 
-    # Apply edge detection method on the image
-    edges = cv2.Canny(blurred, 50, 150)
-    # Apply dilation to make wires thicker
-    kernel = np.ones((9, 9), np.uint8)
-    edges = cv2.dilate(edges, kernel, iterations=2)
-
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+    
+    # Apply Gaussian blur to reduce noise
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    
+    # Apply Canny edge detection
+    edges = cv2.Canny(blurred, 30, 100)
+    
+    # Apply dilation (optional, adjust kernel size if needed)
+    kernel = np.ones((5, 5), np.uint8)
+    dilated = cv2.dilate(edges, kernel, iterations=1)
+    
+    # Find contours on dilated edges
+    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
         length = cv2.arcLength(c, True)
+        
+        # Check for bounding box dimensions and contour length
         if min_width <= w <= max_width and min_length <= length <= max_length:
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
-    plt.imshow(image)    
+    
+    # Show the final image with detected wires
+    plt.imshow(image)
     plt.show()
 
 if __name__ == '__main__':
     breadboard_image = cv2.imread('src/images/breadboard1.jpg')
     cropped, left_crop, right_crop = crop_grids(breadboard_image)
+    
+    # Analyze both left and right crops and show final detections
     detect_wires(left_crop)
     detect_wires(right_crop)
