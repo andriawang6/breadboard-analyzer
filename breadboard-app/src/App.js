@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react'
 
 function App() {
   const [image, setImage] = React.useState([]);
+  const [chips, setChips] = React.useState([]);
+
+  const getChipData = () => {
+    fetch("/chips", {
+      method: "GET"
+    })
+    .then(result => result.json())
+    .then(data => console.log(data)) //log result
+  }
+  
 
   const imageUpload = () => {
     if(image != null) {
@@ -14,8 +24,10 @@ function App() {
       })
       .then(result => result.json())
       .then(data => console.log(data)) //log result
+      .then(function(name){
+        getChipData();
+        })
     }
-    
   }
 
   return (

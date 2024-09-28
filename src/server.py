@@ -1,9 +1,10 @@
 import os
 from io import BytesIO
 from PIL import Image
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from werkzeug.utils import secure_filename
-import base64
+
+import processbreadboard as cvprocess
 
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -11,20 +12,28 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# @app.route('/')
+# def home():
+#     store = 
+#     session['store'] = store
+
 @app.route('/image', methods=['POST'])
 def upload_file():
-    """Handles the upload of a file."""
+    """Handles the upload of an image."""
     d = {}
     try:
         file = request.files['image']
-        #print(f"Uploading file {filename}")
         file_bytes = file.read()
         img = Image.open(BytesIO(file_bytes))
 
         #save image
         if img:
             filename = secure_filename(file.filename)
-            img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            img_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            img.save(img_loc)
+        
+            #image processing
+            session['chips'] = cvprocess.process_image(img_loc)
 
         d['status'] = 1
 
@@ -34,6 +43,14 @@ def upload_file():
 
     return jsonify(d)
 
+@app.route('/chips', methods=['GET'])
+def get_chips():
+    if 'chips' in session:
+        return session['chips']
+    return "bad"
+
 
 if __name__ == "__main__":
+    app.secret_key = "My Secret key"
+    app.config['SESSION_TYPE'] = 'filesystem'
     app.run(debug=True)

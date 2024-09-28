@@ -262,8 +262,8 @@ def detect_chips(image):
             
 
     # Show result
-    plt.imshow(image)
-    plt.show()
+    # plt.imshow(image)
+    # plt.show()
     return chips
 
 
@@ -305,20 +305,33 @@ def detect_wires(image, side, min_width=20, max_width=100, min_length=200, max_l
             endpoints.append([point1, point2])
     
     # Show the final image with detected wires
-    plt.imshow(image)
-    plt.show()
+    # plt.imshow(image)
+    # plt.show()
 
     return endpoints
 
-if __name__ == '__main__':
-    breadboard_image = cv2.imread('../images/breadboard16.jpg')
+
+def process_image(image_path):
+    breadboard_image = cv2.imread(image_path)
     cropped, left_crop, right_crop = crop_grids(breadboard_image)
     
     # Analyze both left and right crops and get wire endpoints
     endpoints = [*detect_wires(left_crop, "left"), *detect_wires(right_crop, "right")]
-    print("endpoints", endpoints)
 
     chips = detect_chips(cropped)
-    print("chips", chips)
+
+    return chips
+
+
+# if __name__ == '__main__':
+#     breadboard_image = cv2.imread('../images/breadboard16.jpg')
+#     cropped, left_crop, right_crop = crop_grids(breadboard_image)
+    
+#     # Analyze both left and right crops and get wire endpoints
+#     endpoints = [*detect_wires(left_crop, "left"), *detect_wires(right_crop, "right")]
+#     print("endpoints", endpoints)
+
+    # chips = detect_chips(cropped)
+    # print("chips", chips)
 
 
