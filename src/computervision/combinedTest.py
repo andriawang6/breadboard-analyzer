@@ -12,7 +12,8 @@ def apply_filter(image):
         filtered: np.array
 
     """
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    blurred =  cv2.blur(image, (30, 30))
+    gray = cv2.cvtColor(blurred, cv2.COLOR_RGB2GRAY)
     kernel = np.ones((5, 5), np.float32) / 15
     filtered = cv2.filter2D(gray, -1, kernel)
     # plt.imshow(cv2.cvtColor(filtered, cv2.COLOR_BGR2RGB))
@@ -81,7 +82,7 @@ def detect_corners_from_contour(canvas, cnt):
         cv2.putText(canvas, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
 
     # Rearranging the order of the corner points
-    approx_corners = [approx_corners[i] for i in [0, 2, 1, 3]]
+    approx_corners = [approx_corners[i] for i in [1, 3, 0, 2]]
 
     # plt.imshow(canvas)
     # plt.title('Corner Points: Douglas-Peucker')
@@ -190,6 +191,14 @@ def crop_grids(image):
 
     # Detect contours and corners
     cnv, largest_contour = detect_contour(threshold_image, image.shape)
+    rect = cv2.boundingRect(largest_contour)
+    x,y,w,h = rect
+    cv2.rectangle(threshold_image,(x,y),(x+w,y+h),(255,0,0),2)
+
+    # Show result
+    plt.imshow(threshold_image)
+    plt.show()
+
     corners = detect_corners_from_contour(cnv, largest_contour)
 
     # Get destination points and perform unwarping
@@ -200,32 +209,51 @@ def crop_grids(image):
     cropped = un_warped[0:h, 0:w]
 
     #percentage offsets
-    startx = (int)(w * 0.22)
-    endx = (int)(w * 0.46)
-
     starty = (int)(h * 0.015)
     endy = (int)(h * 0.982)
+
+    startx = (int)(w * 0.22)
+    endx = (int)(w * 0.46)
 
     centeroffset = (int)(w*0.32)
 
     left_crop = cropped[starty:endy, startx:endx]
-    show_grid(left_crop, (63, 5), (255, 0, 0))
+    #show_grid(left_crop, (63, 5), (255, 0, 0))
 
-    plt.imshow(left_crop)
-    plt.title('left crop')
-    plt.show()
+    # plt.imshow(left_crop)
+    # plt.title('left crop')
+    # plt.show()
 
     right_crop = cropped[starty:endy, startx+centeroffset:endx+centeroffset]
-    show_grid(right_crop, (63, 5), (255, 0, 0))
+    #show_grid(right_crop, (63, 5), (255, 0, 0))
 
-    plt.imshow(right_crop)
-    plt.title('right crop')
+    cropped = cropped[starty:endy, 0:w]
 
-    # Display the plots
+    # plt.imshow(right_crop)
+    # plt.title('right crop')
+
+    # # Display the plots
+    # plt.show()
+    return cropped, left_crop, right_crop
+
+def detect_chips(image):
+    filtered_image = apply_filter(image)
+    threshold_image = apply_threshold(filtered_image)
+    contours, hierarchy = cv2.findContours(threshold_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    for c in contours:
+        rect = cv2.boundingRect(c)
+        if rect[2] < 50 or rect[3] < 50: continue
+        x,y,w,h = rect
+        cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
+
+
+    # Show result
+    plt.imshow(image)
     plt.show()
-
+    
 
 
 if __name__ == '__main__':
-    breadboard_image = cv2.imread('../images/breadboard13.jpg')
-    crop_grids(breadboard_image)
+    breadboard_image = cv2.imread('../images/breadboard17.jpg')
+    cropped, left_crop, right_crop = crop_grids(breadboard_image)
+    detect_chips(cropped)
