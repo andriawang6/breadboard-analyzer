@@ -66,6 +66,13 @@ def get_cropped_image():
         return send_file(session['img_loc'])
     return 0
 
+@app.route('/schematic', methods=['GET'])
+def get_schematic():
+    if 'schematic_path' in session:
+        return send_file(session['schematic_path'])
+    return 0
+
+
 
 if __name__ == "__main__":
     app.secret_key = "My Secret key"

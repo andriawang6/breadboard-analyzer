@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import ImageUploading from "react-images-uploading";
 import { IoMdPhotos } from "react-icons/io";
 import "./fonts/superbakery.ttf";
-import "./App.css"; // Ensure to import the CSS file if you're using one
+import "./App.css"; 
 
 function App() {
   const [images, setImages] = useState([]);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const [showUploadArea, setShowUploadArea] = useState(true);
+  const [schematicImageUrl, setSchematicImageUrl] = useState(null);
+
 
   const onChange = (imageList) => {
     setImages(imageList);
@@ -33,6 +35,26 @@ function App() {
       });
   };
 
+  const getSchematicImage = () => {
+    fetch("/schematic", {
+      method: "GET",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`uh oh HTTP error! status: ${response.status}`);
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        setSchematicImageUrl(url);
+      })
+      .catch((error) => {
+        console.error("Failed to get schematic image:", error.message);
+      });
+  };
+
+
   const imageUpload = () => {
     if (images.length > 0) {
       const fd = new FormData();
@@ -43,15 +65,16 @@ function App() {
         body: fd,
       })
         .then((result) => result.json())
-        .then((data) => console.log(data))
-        .then(() => {
-          getCroppedImage();
+        .then((data) => {
+          console.log(data);
+          getCroppedImage();  
+          getSchematicImage(); 
         });
     }
   };
 
+
   const changePhoto = () => {
-    // Reset image and show upload area again
     setImages([]);
     setShowUploadArea(true);
   };
@@ -277,8 +300,62 @@ function App() {
           </div>
         </>
       )}
+      
     </div>
+    
   );
 }
 
 export default App;
+
+
+// {
+//   !showUploadArea && (
+//     <>
+//       <div
+//         style={{
+//           marginTop: "20px",
+//           maxWidth: "500px",
+//           margin: "0 auto",
+//           textAlign: "center",
+//           padding: "20px",
+//           borderRadius: "10px",
+//           backgroundColor: "#ffffff",
+//           display: "flex",
+//           flexDirection: "column",
+//           alignItems: "center",
+//           justifyContent: "center",
+//           border: "2px dashed #ccc",
+//         }}
+//       >
+//         <h3 style={{ fontSize: "18px", color: "#524f4f" }}>Cropped Image:</h3>
+//         <img
+//           src={croppedImageUrl}
+//           alt="Cropped"
+//           style={{
+//             maxWidth: "100%",
+//             maxHeight: "300px",
+//             borderRadius: "10px",
+//             marginTop: "10px",
+//           }}
+//         />
+//       </div>
+
+//       {/* Schematic Image Rendering */}
+//       {schematicImageUrl && (
+//         <div style={{ marginTop: "20px", textAlign: "center" }}>
+//           <h3>Schematic:</h3>
+//           <img
+//             src={schematicImageUrl}
+//             alt="Schematic"
+//             style={{
+//               maxWidth: "100%",
+//               maxHeight: "300px",
+//               borderRadius: "10px",
+//             }}
+//           />
+//         </div>
+//       )}
+//     </>
+//   );
+// }
