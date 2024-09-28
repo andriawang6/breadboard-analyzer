@@ -48,39 +48,71 @@ bind_row()
 # what bind_row should output: 
 row_binds = {}
 # LEFT SIDE OF NOT
-row_binds["3L"] = "1A"
-row_binds["4L"] = "1Y"
-row_binds["5L"] = "2A"
-row_binds["6L"] = "2Y"
-row_binds["7L"] = "3A"
-row_binds["8L"] = "3Y"
-row_binds["9L"] = "GND"
+row_binds["3L"] = "1Achip1"
+row_binds["4L"] = "1Ychip1"
+row_binds["5L"] = "2Achip1"
+row_binds["6L"] = "2Ychip1"
+row_binds["7L"] = "3Achip1"
+row_binds["8L"] = "3Ychip1"
+row_binds["9L"] = "GNDchip1"
 # RIGHT SIDE OF NOT 
-row_binds["3R"] = "VCC"
-row_binds["4R"] = "6A"
-row_binds["5R"] = "6Y"
-row_binds["6R"] = "5A"
-row_binds["7R"] = "5Y"
-row_binds["8R"] = "4A"
-row_binds["9R"] = "4Y"
+row_binds["3R"] = "VCCchip1"
+row_binds["4R"] = "6Achip1"
+row_binds["5R"] = "6Ychip1"
+row_binds["6R"] = "5Achip1"
+row_binds["7R"] = "5Ychip1"
+row_binds["8R"] = "4Achip1"
+row_binds["9R"] = "4Ychip1"
 
 # LEFT SIDE OF NAND
-row_binds["12L"] = "1A"
-row_binds["13L"] = "1B"
-row_binds["14L"] = "1Y"
-row_binds["15L"] = "2A"
-row_binds["16L"] = "2B"
-row_binds["17L"] = "2Y"
-row_binds["18L"] = "GND"
+row_binds["12L"] = "1Achip2"
+row_binds["13L"] = "1Bchip2"
+row_binds["14L"] = "1Ychip2"
+row_binds["15L"] = "2Achip2"
+row_binds["16L"] = "2Bchip2"
+row_binds["17L"] = "2Ychip2"
+row_binds["18L"] = "GNDchip2"
 # RIGHT SIDE OF NAND
-row_binds["12R"] = "VCC"
-row_binds["13R"] = "4B"
-row_binds["14R"] = "4A"
-row_binds["15R"] = "4Y"
-row_binds["16R"] = "3B"
-row_binds["17R"] = "3A"
-row_binds["18R"] = "3Y"
+row_binds["12R"] = "VCCchip2"
+row_binds["13R"] = "4Bchip2"
+row_binds["14R"] = "4Achip2"
+row_binds["15R"] = "4Ychip2"
+row_binds["16R"] = "3Bchip2"
+row_binds["17R"] = "3Achip2"
+row_binds["18R"] = "3Ychip2"
+
+endpoints = [[(4, 0), (4, 3)], 
+             [(4, 4), (4, 12)], 
+             [(2, 14), (2, 20)],
+             [(0, 0), (0, 5)], 
+             [(0, 6), [0, 13]]]
 
 # given input: endpoints + row bindings
 # created output: relationships
 # take coords and map coordinate to pin 
+# coords are (x, y) --> side is determined by x, row is determined by y
+variables = {}
+def create_relationships(endpoints, row_bindings, middle, variables):
+    def get_binding(coord):
+        side, row = coord[0], coord[1]
+        side = "R" if side > middle else "L"
+        key = str(row) + side
+        binding = row_bindings.get(key, key)
+
+        # if key is not a valid key in row_bindings, add it to variables
+        if binding == key:
+            variables[key] = variables.get(key, chr(65 + len(variables)))
+            return variables[key]
+        return binding
+    
+    bindings = []
+    for start, stop in endpoints:
+        start = get_binding(start)
+        stop = get_binding(stop)
+        bindings.append((start, stop))
+
+    return bindings, variables
+
+b, v = create_relationships(endpoints, row_binds, 5.5, {})
+print(b)
+print(v)
