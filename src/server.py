@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 from PIL import Image
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, send_file, session
 from werkzeug.utils import secure_filename
 from cv2 import imwrite
 
@@ -36,6 +36,7 @@ def upload_file():
             #image processing
             chips, endpoints, cropped_img, chip_bounding = cvprocess.process_image(img_loc)
             imwrite(img_loc, cropped_img)
+            session['img_loc'] = img_loc
             session['chips'] = chips
 
         d['status'] = 1
@@ -51,6 +52,12 @@ def get_chips():
     if 'chips' in session:
         return session['chips']
     return "bad"
+
+@app.route('/croppedimage', methods=['GET'])
+def get_cropped_image():
+    if 'img_loc' in session:
+        return send_file(session['img_loc'])
+    return 0
 
 
 if __name__ == "__main__":
