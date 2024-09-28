@@ -14,9 +14,10 @@ chip_coords["chip2"] = ["74HCT00", (5, 12), (5, 13), (5, 14), (5, 15), (5, 16), 
 
 chip_info = {}
 chip_info["74HCT04"] = ["1A", "1Y", "2A", "2Y", "3A", "3Y", "GND", "4Y", "4A", "5Y", "5A", "6Y", "6A", "VCC"]
-chip_info["74HCT00"] = ["1A", "1B", "1Y" "2A", "2B", "2Y", "GND", "3Y", "3A", "3B", "4Y", "4A", "4B", "VCC"]
+chip_info["74HCT00"] = ["1A", "1B", "1Y", "2A", "2B", "2Y", "GND", "3Y", "3A", "3B", "4Y", "4A", "4B", "VCC"]
 
-def bind_row():
+def bind_rows(chip_coords, chip_info):
+    # row_binds maps row_side -> pin_chip
     row_binds = {}
 
     # go through each list of chip coords to bind coords to pins
@@ -24,24 +25,24 @@ def bind_row():
         # get current chip
         curr_chip = chip_coords[chip_key]
 
-        # get chip info for chip
-        curr_chip_info = chip_info[curr_chip[0]]
+        # get chip info for current chip using the chip name
+        chip_name = curr_chip[0]
+        curr_chip_info = chip_info[chip_name]
 
         # iterate through each coord in the chip
         for i in range(1, 15):
             # determine row and side of coord
-            coord = curr_chip[i]
-            row_side = str(coord[1])
-            row_side += "L" if coord[0] < MIDDLE else "R"
+            side, row = curr_chip[i]
+            row_side = str(row)
+            row_side += "L" if side < MIDDLE else "R"
 
-
-            # bind row_side to the pin
-            row_binds[row_side] = curr_chip_info[i - 1]
+            # bind row_side to the pin+chip
+            row_binds[row_side] = curr_chip_info[i - 1] + chip_key
 
             # print(f"{row_side} -> {row_binds[row_side]}")
     return row_binds
 
-# what bind_row should output: 
+# what bind_rows() should output: 
 row_binds = {}
 # LEFT SIDE OF NOT
 row_binds["3L"] = "1Achip1"
@@ -76,6 +77,12 @@ row_binds["15R"] = "4Ychip2"
 row_binds["14R"] = "4Achip2"
 row_binds["13R"] = "4Bchip2"
 row_binds["12R"] = "VCCchip2"
+
+# print("test bind_rows()")
+# result = bind_rows(chip_coords, chip_info)
+# for key in row_binds:
+#     if result[key] != row_binds[key]:
+#         print(f"{result[key]}, {row_binds[key]}, {key}")
 
 endpoints = [[(4, 0), (4, 3)], 
              [(4, 4), (4, 12)], 
