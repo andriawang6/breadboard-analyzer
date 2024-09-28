@@ -6,8 +6,11 @@ import "./App.css"; // Ensure to import the CSS file if you're using one
 
 function App() {
   const [images, setImages] = useState([]);
+  const [chipPos, setChipPos] = useState([]);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
-  const [showUploadArea, setShowUploadArea] = useState(true);
+  const [appState, setAppState] = useState("upload"); //either upload, identifyChips, or viewSchematic
+  const [unknownChips, setUnknownChips] = useState([]);
+  const [chipTypes, setChipTypes] = useState([]);
 
   const onChange = (imageList) => {
     setImages(imageList);
@@ -26,7 +29,7 @@ function App() {
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         setCroppedImageUrl(url);
-        setShowUploadArea(false);
+        setAppState("identifyChips")
       })
       .catch((error) => {
         console.error("Failed to get cropped image:", error.message);
@@ -53,7 +56,7 @@ function App() {
   const changePhoto = () => {
     // Reset image and show upload area again
     setImages([]);
-    setShowUploadArea(true);
+    setAppState("upload")
   };
 
   return (
@@ -111,7 +114,7 @@ function App() {
         />
       </div>
 
-      {showUploadArea && (
+      {appState === "upload" && (
         <div
           style={{ maxWidth: "500px", margin: "0 auto", textAlign: "center" }}
         >
@@ -210,7 +213,7 @@ function App() {
         </div>
       )}
 
-      {!showUploadArea && (
+      {appState === "identifyChips" && (
         <>
           <div
             style={{
