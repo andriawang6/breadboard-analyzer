@@ -42,7 +42,6 @@ def topological_sort(adjacency_map, inputs):
         linearization.appendleft(curr)
 
     for input in adjacency_map:
-        print(len(adjacency_map))
         topological_sort_helper(input)
 
     return linearization  
