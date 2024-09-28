@@ -77,13 +77,15 @@ def get_gate_inputs(pin_chip, chip_coords, chip_info):
     for i in range(idx - 1, 0, -1):
         if is_gate_input(info[i], pin_chip):
             gate_inputs.append(info[i] + "_" + chip)
-        break
+        else: 
+            break
 
     # look to right of idx 
     for i in range(idx + 1, len(info)):
         if is_gate_input(info[i], pin_chip):
             gate_inputs.append(info[i] + "_" + chip)
-        break
+        else: 
+            break
     return gate_inputs
 
 def get_new_source(sink):
@@ -107,7 +109,7 @@ def generate_logic(connections, inputs, outputs, chip_info, chip_coords):
             return source
         expr = "("
         operator, invert = get_operator(source, chip_info, outputs, chip_coords)
-        
+
         children = get_gate_inputs(source, chip_coords, chip_info)
         for child in children:
             child_source = connection_map[child]
@@ -140,7 +142,7 @@ def generate_logic(connections, inputs, outputs, chip_info, chip_coords):
         cur = "("
         child = trace_back(source)
         cur += child
-        sink_siblings = get_gate_inputs(sink, chip_coords, chip_info)
+        sink_siblings = get_gate_inputs(sink, chip_coords, chip_info) if sink not in outputs else []
         operator, invert = get_operator(sink, chip_info, outputs, chip_coords)
 
         # trace backwards
@@ -166,9 +168,10 @@ def generate_logic(connections, inputs, outputs, chip_info, chip_coords):
         processed.add(sink)
         processed.add(source)
 
-        new_source = get_new_source(sink)
-        new_sink = connection_map[new_source]
-        sink = new_sink
+        if sink not in outputs:
+            new_source = get_new_source(sink)
+            new_sink = connection_map[new_source]
+            sink = new_sink
 
         while sink not in outputs:
             # calculate new source --> we don't care to store it 

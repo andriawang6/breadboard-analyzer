@@ -87,3 +87,7 @@ def create_relationships(endpoints, row_bindings, middle):
         connections.append((start, stop))
 
     return connections, inputs, outputs
+
+def process_logic(endpoints, chip_coords, chip_info, middle):
+    row_binds = bind_rows(chip_coords, chip_info, middle)
+    return create_relationships(endpoints, row_binds, middle) # returns connections, inputs, and outputs
