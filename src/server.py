@@ -6,6 +6,10 @@ from werkzeug.utils import secure_filename
 from cv2 import imwrite
 
 import processbreadboard as cvprocess
+import logicanalysis.logic_processing
+import logicanalysis.generate_logic
+import logicanalysis.draw_schematic
+import datasheets
 
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -38,6 +42,9 @@ def upload_file():
             imwrite(img_loc, cropped_img)
             session['img_loc'] = img_loc
             session['chips'] = chips
+            connections, inputs, outputs = logicanalysis.logic_processing.processlogic(endpoints, chips, datasheets.chip_info, 4.5)
+            expression = logicanalysis.logic_processing.generate_logic(connections, inputs, outputs, datasheets.chip_info, chips)
+            logicanalysis.logic_processing.gen_schematic(expression)
 
         d['status'] = 1
 
