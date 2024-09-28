@@ -86,6 +86,7 @@ def get_gate_inputs(pin_chip, chip_coords, chip_info):
             gate_inputs.append(info[i] + "_" + chip)
         else: 
             break
+      
     return gate_inputs
 
 def get_new_source(sink):
@@ -143,6 +144,7 @@ def generate_logic(connections, inputs, outputs, chip_info, chip_coords):
         child = trace_back(source)
         cur += child
         sink_siblings = get_gate_inputs(sink, chip_coords, chip_info) if sink not in outputs else []
+
         operator, invert = get_operator(sink, chip_info, outputs, chip_coords)
 
         # trace backwards
