@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react'
 
 function App() {
-  const [data, setData] = useState([{}])
+  const [image, setImage] = React.useState([]);
 
-  useEffect(() => {
-    fetch("/fruit").then(response => {
-      return response.json();
-    })
-    .then((data) => {
-      setData(data)
-      console.log(data);
-    })
-  }, [])
+  const imageUpload = () => {
+    if(image != null) {
+      const fd = new FormData()
+      fd.append('image', image)
+
+      fetch("/image", {
+        method: "POST",
+        body: fd
+      })
+      .then(result => result.json())
+      .then(data => console.log(data)) //log result
+    }
+    
+  }
 
   return (
     <div>
-      {(typeof data.fruit === 'undefined') ? (
-        <p>Loading</p>
-      ):(
-        <p className="text-3xl font-bold underline">Data works</p>
-      )}
+      <h1>Image Upload</h1>
+      <input type="file" onChange={ (event) => { 
+        setImage(event.target.files[0]) 
+      } } />
+      <button onClick={ () => {imageUpload()} }>Upload</button>
+
     </div>
   )
 }
