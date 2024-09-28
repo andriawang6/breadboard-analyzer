@@ -3,6 +3,7 @@ from io import BytesIO
 from PIL import Image
 from flask import Flask, jsonify, request, session
 from werkzeug.utils import secure_filename
+from cv2 import imwrite
 
 import processbreadboard as cvprocess
 
@@ -33,7 +34,9 @@ def upload_file():
             img.save(img_loc)
         
             #image processing
-            session['chips'] = cvprocess.process_image(img_loc)
+            chips, endpoints, cropped_img, chip_bounding = cvprocess.process_image(img_loc)
+            imwrite(img_loc, cropped_img)
+            session['chips'] = chips
 
         d['status'] = 1
 
