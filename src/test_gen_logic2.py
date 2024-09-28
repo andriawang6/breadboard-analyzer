@@ -1,5 +1,5 @@
 import logic_processing
-import linearization
+import generate_logic
 import datasheets
 
 MIDDLE = 5.5
@@ -69,8 +69,5 @@ print(c)
 print(list(i))
 print(list(o))
 
-# adj = linearization.generate_adjacency_map(c, i, o)
-# print(adj)
-
-# linearization = linearization.topological_sort(adj, i)
-# print(linearization)
+res = generate_logic.generate_logic(c, i, o, datasheets.chip_info, chip_coords)
+print(res)
