@@ -86,7 +86,8 @@ def detect_corners_from_contour(canvas, cnt):
     # plt.imshow(canvas)
     # plt.title('Corner Points: Douglas-Peucker')
     # plt.show()
-    return approx_corners
+    return approx_corners    
+
 
 def get_destination_points(corners):
     """
@@ -188,6 +189,63 @@ def example_two():
     plt.title('Cropped Image')
     plt.show()
 
+def extra_crop():
+    """
+    Skew correction using homography and corner detection using contour points.
+    Returns: None
+    """
+    # Read and display the original image
+    image = cv2.imread('src/images/breadboard1.jpg')
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    plt.imshow(image)
+    plt.title('Original Image')
+    plt.show()
+
+    # Apply filtering and thresholding
+    filtered_image = apply_filter(image)
+    threshold_image = apply_threshold(filtered_image)
+
+    # Detect contours and corners
+    cnv, largest_contour = detect_contour(threshold_image, image.shape)
+    corners = detect_corners_from_contour(cnv, largest_contour)
+
+    # Get destination points and perform unwarping
+    destination_points, h, w = get_destination_points(corners)
+    un_warped = unwarp(image, np.float32(corners), destination_points)
+
+    # Crop the unwarped image
+    cropped = un_warped[0:h, 0:w]
+    
+    # Define specific region for additional crop
+    x, y = int(w*0.1), int(h*0.4)  # Specify starting position as a fraction of the cropped image
+    crop_width, crop_height = w*0.3, h*0.8  # Absolute size of the cropped region in pixels
+
+    # Convert relative position (x, y) to absolute pixel values
+    start_x = int(x * w)
+    start_y = int(y * h)
+
+    # Ensure the width and height are within bounds
+    end_x = min(start_x + crop_width, w)
+    end_y = min(start_y + crop_height, h)
+
+    # Further crop the image using the calculated coordinates
+    cropped2 = cropped[start_y:end_y, start_x:end_x]
+
+    # Display both the initial cropped and the further cropped images side by side
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))  # Create a figure with 2 subplots
+
+    # Show the initial cropped image
+    ax1.imshow(cropped)
+    ax1.set_title('Initial Cropped Image')
+
+    # Show the further cropped image
+    ax2.imshow(cropped2)
+    ax2.set_title('Further Cropped Image')
+
+    # Display the plots
+    plt.show()
+
+
 
 if __name__ == '__main__':
-    example_two()
+    extra_crop()
