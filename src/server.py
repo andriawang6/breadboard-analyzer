@@ -53,4 +53,4 @@ def get_chips():
 if __name__ == "__main__":
     app.secret_key = "My Secret key"
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

@@ -141,7 +141,7 @@ def unwarp(img, src, dst):
 
     # plot
 
-    f, (ax2) = plt.subplots(1, figsize=(15, 8))
+    # f, (ax2) = plt.subplots(1, figsize=(15, 8))
     # f.subplots_adjust(hspace=.2, wspace=.05)
     # ax1.imshow(img)
     # ax1.set_title('Original Image')
