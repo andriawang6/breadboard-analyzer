@@ -72,3 +72,6 @@ c, i, o = logic_processing.create_relationships(endpoints, result, MIDDLE)
 
 adj = linearization.generate_adjacency_map(c, i, o)
 print(adj)
+
+linearization = linearization.topological_sort(adj, i)
+print(linearization)
