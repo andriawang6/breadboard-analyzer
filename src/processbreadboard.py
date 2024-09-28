@@ -237,13 +237,15 @@ def crop_grids(image):
     return cropped, left_crop, right_crop
 
 def detect_chips(image):
-    chips = []
+    chips = {}
 
     filtered_image = apply_filter(image)
     threshold_image = apply_threshold(filtered_image)
     contours, _ = cv2.findContours(threshold_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     im_shape = image.shape
     rects = []
+
+    chip_count = 1
     for c in contours:
         rect = cv2.boundingRect(c)
         #ignores too small or bounding the entire breadboard
@@ -254,14 +256,15 @@ def detect_chips(image):
 
         #assign
         pin_7_row = int((y+h)/(im_shape[0]/63)) - 1
-        chips.append([""])
+        chipID = "chip" + str(chip_count)
+        chips[chipID] = [""]
         for i in range(1, 15):
             if i <= 7:
-                chips[len(chips) - 1].append((4, pin_7_row-(7 - i)))
+                chips[chipID].append((4, pin_7_row-(7 - i)))
             else:
-                chips[len(chips) - 1].append((5, pin_7_row-(i-7-1)))
+                chips[chipID].append((5, pin_7_row-(i-7-1)))
         #print(chips[len(chips) - 1])
-            
+        chip_count += 1
 
     # Show result
     # plt.imshow(image)
