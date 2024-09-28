@@ -75,10 +75,10 @@ def detect_corners_from_contour(canvas, cnt):
     approx_corners = cv2.approxPolyDP(cnt, epsilon, True)
     cv2.drawContours(canvas, approx_corners, -1, (255, 255, 0), 10)
     approx_corners = sorted(np.concatenate(approx_corners).tolist())
-    print('\nThe corner points are ...\n')
+    # print('\nThe corner points are ...\n')
     for index, c in enumerate(approx_corners):
         character = chr(65 + index)
-        print(character, ':', c)
+        # print(character, ':', c)
         cv2.putText(canvas, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
 
     # Rearranging the order of the corner points
@@ -115,12 +115,12 @@ def get_destination_points(corners):
 
     destination_corners = np.float32([(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)])
 
-    print('\nThe destination points are: \n')
-    for index, c in enumerate(destination_corners):
-        character = chr(65 + index) + "'"
-        print(character, ':', c)
+    # print('\nThe destination points are: \n')
+    # for index, c in enumerate(destination_corners):
+    #     character = chr(65 + index) + "'"
+    #     print(character, ':', c)
 
-    print('\nThe approximated height and width of the original image is: \n', (h, w))
+    # print('\nThe approximated height and width of the original image is: \n', (h, w))
     return destination_corners, h, w
 
 def unwarp(img, src, dst):
@@ -136,7 +136,7 @@ def unwarp(img, src, dst):
     """
     h, w = img.shape[:2]
     H, _ = cv2.findHomography(src, dst, method=cv2.RANSAC, ransacReprojThreshold=3.0)
-    print('\nThe homography matrix is: \n', H)
+    # print('\nThe homography matrix is: \n', H)
     un_warped = cv2.warpPerspective(img, H, (w, h), flags=cv2.INTER_LINEAR)
 
     # plot
@@ -237,23 +237,38 @@ def crop_grids(image):
     return cropped, left_crop, right_crop
 
 def detect_chips(image):
+    chips = []
+
     filtered_image = apply_filter(image)
     threshold_image = apply_threshold(filtered_image)
-    contours, hierarchy = cv2.findContours(threshold_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(threshold_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    im_shape = image.shape
     for c in contours:
         rect = cv2.boundingRect(c)
-        if rect[2] < 50 or rect[3] < 50: continue
+        #ignores too small or bounding the entire breadboard
+        if rect[2] < 80 or rect[3] < 80 or (rect[2] * rect[3])/(image.shape[0] * image.shape[1]) > 0.9: continue
         x,y,w,h = rect
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
 
+        #assign
+        pin_7_row = int((y+h)/(im_shape[0]/63)) - 1
+        chips.append([""])
+        for i in range(1, 15):
+            if i <= 7:
+                chips[len(chips) - 1].append((4, pin_7_row-(7 - i)))
+            else:
+                chips[len(chips) - 1].append((5, pin_7_row-(i-7-1)))
+        print(chips[len(chips) - 1])
+            
 
     # Show result
     plt.imshow(image)
     plt.show()
+    return chips
     
 
 
 if __name__ == '__main__':
-    breadboard_image = cv2.imread('../images/breadboard17.jpg')
+    breadboard_image = cv2.imread('../images/breadboard16.jpg')
     cropped, left_crop, right_crop = crop_grids(breadboard_image)
     detect_chips(cropped)
