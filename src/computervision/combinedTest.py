@@ -267,8 +267,28 @@ def detect_chips(image):
     return chips
     
 
+def detect_wires(image, min_width=25, max_width=70, min_length=180, max_length=10000):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (7, 7), 0) 
+    # Apply edge detection method on the image
+    edges = cv2.Canny(blurred, 50, 150)
+    # Apply dilation to make wires thicker
+    kernel = np.ones((9, 9), np.uint8)
+    edges = cv2.dilate(edges, kernel, iterations=2)
+
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+        length = cv2.arcLength(c, True)
+        if min_width <= w <= max_width and min_length <= length <= max_length:
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+    plt.imshow(image)    
+    plt.show()
 
 if __name__ == '__main__':
-    breadboard_image = cv2.imread('../images/breadboard16.jpg')
+    breadboard_image = cv2.imread('src/images/breadboard1.jpg')
     cropped, left_crop, right_crop = crop_grids(breadboard_image)
-    detect_chips(cropped)
+    detect_wires(left_crop)
+    detect_wires(right_crop)
