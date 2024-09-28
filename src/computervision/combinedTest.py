@@ -124,7 +124,6 @@ def get_destination_points(corners):
 
 def unwarp(img, src, dst):
     """
-
     Args:
         img: np.array
         src: list
@@ -149,57 +148,41 @@ def unwarp(img, src, dst):
     x = [src[0][0], src[2][0], src[3][0], src[1][0], src[0][0]]
     y = [src[0][1], src[2][1], src[3][1], src[1][1], src[0][1]]
 
-    ax2.imshow(img)
-    ax2.plot(x, y, color='yellow', linewidth=3)
-    ax2.set_ylim([h, 0])
-    ax2.set_xlim([0, w])
-    ax2.set_title('Target Area')
+    # ax2.imshow(img)
+    # ax2.plot(x, y, color='yellow', linewidth=3)
+    # ax2.set_ylim([h, 0])
+    # ax2.set_xlim([0, w])
+    # ax2.set_title('Target Area')
 
     # plt.show()
     return un_warped
 
+def show_grid(image, dimensions, color):
+    h, w, _ = image.shape
+    rows, cols = dimensions
+    dy, dx = h / rows, w / cols
 
-def example_two():
-    """
-    Skew correction using homography and corner detection using contour points
-    Returns: None
+    # draw vertical lines
+    for x in np.linspace(start=dx, stop=w-dx, num=cols-1):
+        x = int(round(x))
+        cv2.line(image, (x, 0), (x, h), color, thickness=3)
 
-    """
-    image = cv2.imread('src/images/breadboard1.jpg')
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    plt.imshow(image)
-    plt.title('Original Image')
-    plt.show()
+    # draw horizontal lines
+    for y in np.linspace(start=dy, stop=h-dy, num=rows-1):
+        y = int(round(y))
+        cv2.line(image, (0, y), (w, y), color, thickness=3)
 
-    filtered_image = apply_filter(image)
-    threshold_image = apply_threshold(filtered_image)
-
-    cnv, largest_contour = detect_contour(threshold_image, image.shape)
-    corners = detect_corners_from_contour(cnv, largest_contour)
-
-    destination_points, h, w = get_destination_points(corners)
-    
-    un_warped = unwarp(image, np.float32(corners), destination_points)
-
-    cropped = un_warped[0:h, 0:w]
-    f, (ax2) = plt.subplots(1, figsize=(5, 8))
-    # f.subplots_adjust(hspace=.2, wspace=.05)
-    # ax1.imshow(un_warped)
-    ax2.imshow(cropped)
-    plt.title('Cropped Image')
-    plt.show()
-
-def extra_crop():
+def crop_grids(image):
     """
     Skew correction using homography and corner detection using contour points.
     Returns: None
     """
     # Read and display the original image
-    image = cv2.imread('src/images/breadboard1.jpg')
+
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    plt.imshow(image)
-    plt.title('Original Image')
-    plt.show()
+    # plt.imshow(image)
+    # plt.title('Original Image')
+    # plt.show()
 
     # Apply filtering and thresholding
     filtered_image = apply_filter(image)
@@ -215,32 +198,28 @@ def extra_crop():
 
     # Crop the unwarped image
     cropped = un_warped[0:h, 0:w]
-    
-    # Define specific region for additional crop
-    x, y = int(w*0.1), int(h*0.4)  # Specify starting position as a fraction of the cropped image
-    crop_width, crop_height = w*0.3, h*0.8  # Absolute size of the cropped region in pixels
 
-    # Convert relative position (x, y) to absolute pixel values
-    start_x = int(x * w)
-    start_y = int(y * h)
+    #percentage offsets
+    startx = (int)(w * 0.22)
+    endx = (int)(w * 0.46)
 
-    # Ensure the width and height are within bounds
-    end_x = min(start_x + crop_width, w)
-    end_y = min(start_y + crop_height, h)
+    starty = (int)(h * 0.015)
+    endy = (int)(h * 0.982)
 
-    # Further crop the image using the calculated coordinates
-    cropped2 = cropped[start_y:end_y, start_x:end_x]
+    centeroffset = (int)(w*0.32)
 
-    # Display both the initial cropped and the further cropped images side by side
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))  # Create a figure with 2 subplots
+    left_crop = cropped[starty:endy, startx:endx]
+    show_grid(left_crop, (63, 5), (255, 0, 0))
 
-    # Show the initial cropped image
-    ax1.imshow(cropped)
-    ax1.set_title('Initial Cropped Image')
+    plt.imshow(left_crop)
+    plt.title('left crop')
+    plt.show()
 
-    # Show the further cropped image
-    ax2.imshow(cropped2)
-    ax2.set_title('Further Cropped Image')
+    right_crop = cropped[starty:endy, startx+centeroffset:endx+centeroffset]
+    show_grid(right_crop, (63, 5), (255, 0, 0))
+
+    plt.imshow(right_crop)
+    plt.title('right crop')
 
     # Display the plots
     plt.show()
@@ -248,4 +227,5 @@ def extra_crop():
 
 
 if __name__ == '__main__':
-    extra_crop()
+    breadboard_image = cv2.imread('../images/breadboard13.jpg')
+    crop_grids(breadboard_image)
