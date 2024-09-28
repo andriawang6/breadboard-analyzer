@@ -2,3 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+ font-family: "superbakery";
+ src: local("./fonts/superbakery"),
+  url("./fonts/superbakery.ttf") format("truetype");
+ font-weight: bold;
+}
+
+.superbakery {
+  font-family: "superbakery", sans-serif; /* Fallback to sans-serif */
+}
