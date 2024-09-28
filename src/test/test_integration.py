@@ -1,5 +1,12 @@
-import logic_processing
-import generate_logic
+import sys
+import os
+
+current_dir = os.path.dirname(__file__)
+src_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.append(src_dir)
+
+import logicanalysis.logic_processing as logic_processing
+import logicanalysis.generate_logic as generate_logic
 import datasheets
 
 chip_info = datasheets.chip_info

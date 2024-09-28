@@ -1,5 +1,5 @@
 # take in connections 
-# process into adjaceny list 
+# process into adjacency list 
 from collections import defaultdict, deque
 
 def generate_adjacency_map(connections, inputs, outputs):    
