@@ -53,6 +53,14 @@ row_binds["16R"] = "3B"
 row_binds["17R"] = "3A"
 row_binds["18R"] = "3Y"
 
+endpoints = [[(4, 0), (4, 3)], 
+             [(4, 4), (4, 12)], 
+             [(2, 14), (2, 20)],
+             [(0, 0), (0, 5)], 
+             [(0, 6), [0, 13]]]
+
 # given input: endpoints + row bindings
 # created output: relationships
 # take coords and map coordinate to pin 
+def create_relationships():
+    print("create relationships of everything")
