@@ -1,5 +1,6 @@
 import logic_processing
 import linearization
+import datasheets
 
 MIDDLE = 5.5
 
@@ -11,9 +12,7 @@ chip_coords["chip1"] = ["74HCT04", (5, 3), (5, 4), (5, 5), (5, 6), (5, 7), (5, 8
 chip_coords["chip2"] = ["74HCT00", (5, 12), (5, 13), (5, 14), (5, 15), (5, 16), (5, 17), (5, 18), 
                                    (6, 18), (6, 17), (6, 16), (6, 15), (6, 14), (6, 13), (6, 12)]
 
-chip_info = {}
-chip_info["74HCT04"] = ["NOT", "1A", "1Y", "2A", "2Y", "3A", "3Y", "GND", "4Y", "4A", "5Y", "5A", "6Y", "6A", "VCC"]
-chip_info["74HCT00"] = ["NAND", "1A", "1B", "1Y", "2A", "2B", "2Y", "GND", "3Y", "3A", "3B", "4Y", "4A", "4B", "VCC"]
+chip_info = datasheets.chip_info
 
 # what bind_rows() should output: 
 row_binds = {}
@@ -58,20 +57,20 @@ endpoints = [[(4, 0), (4, 3)],
              [(0, 6), [0, 13]]]
 
 
-# print("test bind_rows()")
+print("test bind_rows()")
 result = logic_processing.bind_rows(chip_coords, chip_info, MIDDLE)
-# for key in row_binds:
-#     if result[key] != row_binds[key]:
-#         print(f"{result[key]}, {row_binds[key]}, {key}")
+for key in row_binds:
+    if result[key] != row_binds[key]:
+        print(f"{result[key]}, {row_binds[key]}, {key}")
 
-# print("test create_relationships()")
+print("test create_relationships()")
 c, i, o = logic_processing.create_relationships(endpoints, result, MIDDLE)
-# print(c)
-# print(list(i))
-# print(list(o))
+print(c)
+print(list(i))
+print(list(o))
 
-adj = linearization.generate_adjacency_map(c, i, o)
-print(adj)
+# adj = linearization.generate_adjacency_map(c, i, o)
+# print(adj)
 
-linearization = linearization.topological_sort(adj, i)
-print(linearization)
+# linearization = linearization.topological_sort(adj, i)
+# print(linearization)

@@ -1,5 +1,6 @@
 import logic_processing
 import linearization
+import datasheets
 
 MIDDLE = 4.5
 
@@ -11,8 +12,7 @@ chip_coords["chip1"] = ["74HCT08", (4, 5), (4, 6), (4, 7), (4, 8), (4, 9), (4, 1
 chip_coords["chip2"] = ["74HCT04", (4, 21), (4, 22), (4, 23), (4, 24), (4, 25), (4, 26), (4, 27), 
                                    (5, 27), (5, 26), (5, 25), (5, 24), (5, 23), (5, 22), (5, 21)]
 
-chip_info = {"74HCT08" : ["AND", "1A", "1B", "1Y", "2A", "2B", "2Y", "GND", "3Y", "3A", "3B", "4Y", "4A", "4B", "VCC"],
-             "74HCT04" : ["NOT", "1A", "1Y", "2A", "2Y", "3A", "3Y", "GND", "4Y", "4A", "5Y", "5A", "6Y", "6A", "VCC"]}
+chip_info = datasheets.chip_info
 
 # what bind_rows() should output: 
 row_binds = { # LEFT SIDE OF AND
