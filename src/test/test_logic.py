@@ -1,5 +1,11 @@
-import logic_processing
-import linearization
+import sys
+import os
+
+current_dir = os.path.dirname(__file__)
+src_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.append(src_dir)
+
+import logicanalysis.logic_processing as logic_processing
 import datasheets
 
 MIDDLE = 5.5

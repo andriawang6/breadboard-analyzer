@@ -1,5 +1,12 @@
-import logic_processing
-import linearization
+import sys
+import os
+
+current_dir = os.path.dirname(__file__)
+src_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.append(src_dir)
+
+import logicanalysis.logic_processing as logic_processing
+import logicanalysis.generate_logic as generate_logic
 import datasheets
 
 MIDDLE = 4.5
@@ -57,20 +64,8 @@ endpoints = [[(1, 1), (3, 5)],
              [(1, 2), (1, 6)]]
 
 
-print("test bind_rows()")
 result = logic_processing.bind_rows(chip_coords, chip_info, MIDDLE)
-for key in row_binds:
-    if result[key] != row_binds[key]:
-        print(f"{result[key]}, {row_binds[key]}, {key}")
-
-print("test create_relationships()")
 c, i, o = logic_processing.create_relationships(endpoints, result, MIDDLE)
-print(c)
-print(list(i))
-print(list(o))
 
-adj = linearization.generate_adjacency_map(c, i, o)
-print(adj)
-
-linearization = linearization.topological_sort(adj, i)
-print(linearization)
+res = generate_logic.generate_logic(c, i, o, datasheets.chip_info, chip_coords)
+print(res)
