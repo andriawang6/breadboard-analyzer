@@ -258,7 +258,7 @@ def detect_chips(image):
                 chips[len(chips) - 1].append((4, pin_7_row-(7 - i)))
             else:
                 chips[len(chips) - 1].append((5, pin_7_row-(i-7-1)))
-        print(chips[len(chips) - 1])
+        #print(chips[len(chips) - 1])
             
 
     # Show result
@@ -267,7 +267,7 @@ def detect_chips(image):
     return chips
 
 
-def detect_wires(image, min_width=20, max_width=100, min_length=200, max_length=10000):
+def detect_wires(image, side, min_width=20, max_width=100, min_length=200, max_length=10000):
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
@@ -283,6 +283,9 @@ def detect_wires(image, min_width=20, max_width=100, min_length=200, max_length=
     
     # Find contours on dilated edges
     contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    im_shape = image.shape
+
+    endpoints = []
     
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
@@ -291,15 +294,31 @@ def detect_wires(image, min_width=20, max_width=100, min_length=200, max_length=
         # Check for bounding box dimensions and contour length
         if min_width <= w <= max_width and min_length <= length <= max_length:
             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+            #handles left and right side coords
+            offset = 5 if side == "right" else 0
+
+            point1 = ((int((x)/(im_shape[1]/5) + offset)), (int((y)/(im_shape[0]/63))))
+            point2 = ((int((x)/(im_shape[1]/5) + offset)), (int((y+h)/(im_shape[0]/63))))
+
+            if point1[0] == 4 or point1[0] == 5: continue
+            endpoints.append([point1, point2])
     
     # Show the final image with detected wires
     plt.imshow(image)
     plt.show()
 
+    return endpoints
+
 if __name__ == '__main__':
-    breadboard_image = cv2.imread('src/images/breadboard1.jpg')
+    breadboard_image = cv2.imread('../images/breadboard16.jpg')
     cropped, left_crop, right_crop = crop_grids(breadboard_image)
     
-    # Analyze both left and right crops and show final detections
-    detect_wires(left_crop)
-    detect_wires(right_crop)
+    # Analyze both left and right crops and get wire endpoints
+    endpoints = [*detect_wires(left_crop, "left"), *detect_wires(right_crop, "right")]
+    print("endpoints", endpoints)
+
+    chips = detect_chips(cropped)
+    print("chips", chips)
+
+
