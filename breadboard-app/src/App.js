@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import ImageUploading from "react-images-uploading";
 import { IoMdPhotos } from "react-icons/io";
 import "./fonts/superbakery.ttf";
+import "./App.css"; // Ensure to import the CSS file if you're using one
 
 function App() {
   const [images, setImages] = useState([]);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
-  const [showUploadArea, setShowUploadArea] = useState(true); 
+  const [showUploadArea, setShowUploadArea] = useState(true);
 
   const onChange = (imageList) => {
     setImages(imageList);
@@ -25,7 +26,7 @@ function App() {
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         setCroppedImageUrl(url);
-        setShowUploadArea(false);  
+        setShowUploadArea(false);
       })
       .catch((error) => {
         console.error("Failed to get cropped image:", error.message);
@@ -49,8 +50,22 @@ function App() {
     }
   };
 
+  const changePhoto = () => {
+    // Reset image and show upload area again
+    setImages([]);
+    setShowUploadArea(true);
+  };
+
   return (
-    <div>
+    <div
+      style={{
+        backgroundImage: `url(static/background.jpg)`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+        padding: "20px",
+      }}
+    >
       <div
         className="superbakery"
         style={{
@@ -59,16 +74,44 @@ function App() {
           maxWidth: "1000px",
           margin: "0 auto",
           textAlign: "center",
-          marginBottom: "-10px",
+          marginBottom: "-50px",
+          color: "#524f4f",
         }}
       >
         BreadBoard Bakery
       </div>
-      <p style={{ textAlign: "center", padding: "5px", marginBottom: "15px" }}>
-        Add your breadboard image to our bakery! <br /> We'll analyze it and
-        give you a freshly baked schematic!
-      </p>
-      {showUploadArea && ( 
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+          marginBottom: "-30px",
+        }}
+      >
+        <p
+          style={{
+            textAlign: "center",
+            padding: "5px",
+            color: "#524f4f",
+            marginRight: "-50px",
+          }}
+        >
+          Add your breadboard image to our bakery! <br /> We'll analyze it and
+          give you a freshly baked schematic!
+        </p>
+        <img
+          src={"static/bear.png"}
+          style={{
+            maxWidth: "15%",
+            height: "auto",
+            marginLeft: "10px",
+          }}
+        />
+      </div>
+
+      {showUploadArea && (
         <div
           style={{ maxWidth: "500px", margin: "0 auto", textAlign: "center" }}
         >
@@ -117,7 +160,7 @@ function App() {
                       color="#ccc"
                       style={{ marginBottom: "10px" }}
                     />
-                    <div>Browse or Drop Image</div>
+                    <div style={{ color: "gray" }}>Browse or Drop Image</div>
                   </div>
                 ) : (
                   <div
@@ -157,7 +200,7 @@ function App() {
               padding: "10px 20px",
               borderRadius: "5px",
               border: "none",
-              backgroundColor: "#f4c089",
+              backgroundColor: "#ab7d58",
               color: "white",
               cursor: "pointer",
             }}
@@ -166,27 +209,73 @@ function App() {
           </button>
         </div>
       )}
+
       {!showUploadArea && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h3 style={{ fontSize: "18px" }}>Cropped Image:</h3>{" "}
-          <img
-            src={croppedImageUrl}
-            alt="Cropped"
+        <>
+          <div
             style={{
-              maxWidth: "100%",
-              maxHeight: "300px",
+              marginTop: "20px",
+              maxWidth: "500px",
+              margin: "0 auto",
+              textAlign: "center",
+              padding: "20px",
               borderRadius: "10px",
-              margin: "0 auto", 
+              backgroundColor: "#ffffff",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "2px dashed #ccc",
             }}
-          />
-        </div>
+          >
+            <h3 style={{ fontSize: "18px", color: "#524f4f" }}>
+              Cropped Image:
+            </h3>
+            <div
+              style={{
+                padding: "20px",
+                borderRadius: "10px",
+                backgroundColor: "#ffffff",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <img
+                src={croppedImageUrl}
+                alt="Cropped"
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "300px",
+                  borderRadius: "10px",
+                  marginTop: "10px",
+                }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "20px",
+            }}
+          >
+            <button
+              onClick={changePhoto}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "5px",
+                border: "none",
+                backgroundColor: "#ab7d58",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Change Photo
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
