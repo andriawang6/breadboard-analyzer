@@ -1,6 +1,3 @@
-# turn connections into map 
-# 
-
 def connections_undirected_map(connections):
     undirected_map = {}
     for a, b in connections:
@@ -21,23 +18,108 @@ def is_source(candidate, inputs, outputs):
             break
         i += 1
 
-def generate_logic(connection_map, inputs, outputs):
+    return candidate[i] == "Y"
+
+def parse_pin_chip(pin_chip):
+    i = 0 
+    pin = ""
+    for char in pin_chip:
+        if char == "_":
+            break
+        pin += char
+        i += 1
+    chip = pin_chip[i + 1:]
+    return pin, chip 
+
+def get_operator(pin_chip, chip_info, outputs):
+    # if pin_chip is an output, the operator is just "= variable"
+    if pin_chip in outputs:
+        return "=" + pin_chip, ""
+    pin, chip = parse_pin_chip(pin_chip)
+    operator = chip_info[chip][-1]
+    if operator == "'":
+        return "", "'"
+    if len(operator) > 1:
+        return operator[0], "'"
+    return operator[0], ""
+
+def is_gate_input(cand, pin):
+    if cand == "GND" or cand == "VCC":
+        return False
+    cand_num, cand_let = parse_pin(cand)
+    pin_num, pin_let = parse_pin(pin)
+    if cand_num != pin_num:
+        return False
+    if cand_let == "Y":
+        return False
+    return True
+
+def parse_pin(pin):
+    i = 0
+    for char in pin:
+        if char.isnumeric():
+            i += 1
+        break
+
+    num = pin[:i]
+    let = pin[i + 1:]
+    return num, let
+
+def get_gate_inputs(pin_chip, chip_info):
+    # search for pin --> look to the left and right of it until we reach a Y or GND or VCC
+    pin, chip = parse_pin_chip(pin_chip)
+    info = chip_info[chip]
+    idx = info.index(pin)
+    
+    gate_inputs = []
+    # look to left of idx
+    for i in range(idx, 0, -1):
+        if is_gate_input(info[i], pin):
+            gate_inputs.append(info[i])
+        break
+
+    # look to right of idx 
+    for i in range(idx, len(info)):
+        if is_gate_input(info[i], pin):
+            gate_inputs.append(info[i])
+        break
+
+    return gate_inputs
+
+def generate_logic(connection_map, inputs, outputs, chip_info):
     res = []
     visited = set()
 
-    def trace_back(new_sink, curr):
-        new_source = connection_map[new_sink]
-        if new_source in inputs:
-            # add new_source to curr
-            return
-        if sink in outputs:
-            return 
+    def trace_back(source):
+        if source in inputs:
+            # base case; return source
+            return source
+        expr = "("
+        operator, invert = get_operator(source, chip_info)
+        
+        children = get_gate_inputs(source)
+        for child in children:
+            child_source = connection_map[child]
+            expr += trace_back(child_source)
+            expr += operator
+
+        # slice off extra operator
+        expr = expr[:-1] if expr[-1] == operator else expr
+        expr += ")" + invert
+        return expr
+            
+        # now, find children of source
+        # for child in children:
+            # track_back(child.source)
+            # cur += operands
+        
+
         
         print(f"tracing back")
 
     for a in connection_map:
         b = connection_map[a]
-
+        # MAKE SURE TO UPDATE VISITED SET 
         if a in visited or b in visited:
             continue
 
@@ -47,7 +129,30 @@ def generate_logic(connection_map, inputs, outputs):
         source = a if a_is_source else b
         sink = b if a_is_source else a
 
-        cur = ""
+        cur = "("
+        child = trace_back(source)
+        cur += child
+        
+        sink_siblings = get_gate_inputs(sink)
+        operator, invert = get_operator(sink, chip_info)
+
+        # trace backwards
+        for sibling in sink_siblings:
+            cur += operator # being AND or OR, not NOT; if NAND or NOR, negate at end 
+            sibling_source = connection_map[sibling]
+            operand = trace_back(sibling_source)
+            cur += operand
+            
+        cur += ")"
+        cur += invert
+
+        # trace forwards
+        # now, navigate to the new source (i.e. what sink feeds into)
+            # first check if sink is output --> if so return nothing (append on  = sink)
+        
+        
+
+
         # process cur_sink (not recursive)
         
         # process cur_source (recursive)
