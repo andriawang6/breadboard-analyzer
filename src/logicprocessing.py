@@ -34,16 +34,12 @@ def bind_row():
             row_side = str(coord[1])
             row_side += "L" if coord[0] < MIDDLE else "R"
 
+
             # bind row_side to the pin
             row_binds[row_side] = curr_chip_info[i - 1]
 
-            print(f"{row_side} -> {row_binds[row_side]}")
-        
-    print("bind row&side : chip&pin")
+            # print(f"{row_side} -> {row_binds[row_side]}")
     return row_binds
-
-
-bind_row()
 
 # what bind_row should output: 
 row_binds = {}
@@ -113,6 +109,6 @@ def create_relationships(endpoints, row_bindings, middle, variables):
 
     return bindings, variables
 
-b, v = create_relationships(endpoints, row_binds, 5.5, {})
-print(b)
-print(v)
+# b, v = create_relationships(endpoints, row_binds, 5.5, {})
+# print(b)
+# print(v)
