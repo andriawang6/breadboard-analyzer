@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/breadboard-analyzer/static/css/main.775f2d1c.css",
+    "main.js": "/breadboard-analyzer/static/js/main.58a6a693.js",
+    "static/js/453.df3b2802.chunk.js": "/breadboard-analyzer/static/js/453.df3b2802.chunk.js",
+    "static/media/superbakery.ttf": "/breadboard-analyzer/static/media/superbakery.b1164d298b2a0e515302.ttf",
+    "index.html": "/breadboard-analyzer/index.html",
+    "main.775f2d1c.css.map": "/breadboard-analyzer/static/css/main.775f2d1c.css.map",
+    "main.58a6a693.js.map": "/breadboard-analyzer/static/js/main.58a6a693.js.map",
+    "453.df3b2802.chunk.js.map": "/breadboard-analyzer/static/js/453.df3b2802.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.775f2d1c.css",
+    "static/js/main.58a6a693.js"
+  ]
+}
