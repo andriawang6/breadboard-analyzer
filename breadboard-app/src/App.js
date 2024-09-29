@@ -413,7 +413,9 @@ function App() {
 
         
         {displaySchematics && (
-          <div>
+          <div style={{
+            display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px"
+          }}>
               {
                     
                     schematicImgs.map(
