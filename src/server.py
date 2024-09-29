@@ -58,8 +58,6 @@ def upload_file():
             session['endpoints'] = res
 
 
-
-
         d['status'] = 1
 
     except Exception as e:
@@ -110,12 +108,18 @@ def get_SVG():
     connections, inputs, outputs = logicanalysis.logic_processing.process_logic(session['endpoints'], session['chip_coords'], datasheets.chip_info, 4.5)
     print(f"generated {connections}")
     expressions = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
-    #expressions.append("A=B")
+    expressions.append("A&B=C")
+    expressions.append("A+B=C")
+
+    dir = "static/schematics"
+    #clear directory
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
     
     for i, expr in enumerate(expressions):
         logicanalysis.draw_schematic.gen_schematic(expr, i)
 
-    return jsonify(1)
+    return jsonify(len(expressions))
     
 
 if __name__ == "__main__":

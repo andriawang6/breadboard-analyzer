@@ -11,10 +11,13 @@ function App() {
   const [appState, setAppState] = useState("upload"); //either upload, identifyChips, or viewSchematic
   const [unknownChips, setUnknownChips] = useState([]);
   const [chipTypes, setChipTypes] = useState([]);
+  const [displaySchematics, setDiplaySchematics] = useState(false);
+  const [schematicImgs, setSchematicImgs] = useState([]);
 
   const onChange = (imageList) => {
     setImages(imageList);
   };
+
 
   function handleChipSubmit(e) {
     // Prevent the browser from reloading the page
@@ -27,8 +30,18 @@ function App() {
     setUnknownChips(unknownChips - 1)
   }
 
+  function updateSchematicImages(length) {
+    let imgList = []
+    for(let i = 0; i < length; i++) {
+      imgList.push("static/schematics/schematic"+i+".svg");
+    }
+    setSchematicImgs(imgList)
+    setDiplaySchematics(true)
+  }
+
   const sendChipInfo = () => {
     if(unknownChips === 0) {
+      setAppState("displaySchematic");
       const fd = new FormData();
       fd.append("chips", JSON.parse(JSON.stringify(chipTypes)));
       //POST request to send form info
@@ -111,7 +124,8 @@ function App() {
         return response.json();
       })
       .then((data) => {
-        console.log(data)
+        // console.log(data)
+        updateSchematicImages(data);
       });
 
   }
@@ -278,7 +292,7 @@ function App() {
       )}
 
         {/* show cropped image */}
-      {appState === "identifyChips" && (
+      {appState !== "upload" && (
         <div>
         <div
           style={{
@@ -337,7 +351,7 @@ function App() {
         </div> )}
 {/* 
         PROMPT USER */}
-        {unknownChips > 0 && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px 0" }}>
+        {unknownChips > 0 && appState === "identifyChips" && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px 0" }}>
           <p
             style={{
               textAlign: "center",
@@ -379,7 +393,7 @@ function App() {
 
         </div>)}
 
-        {unknownChips === 0 && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px" }}>
+        {unknownChips === 0 && appState === "identifyChips" && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px" }}>
           <button type="button" onClick={sendChipInfo} 
             style={{
               marginTop: "0",
@@ -393,8 +407,21 @@ function App() {
           >
             Submit
           </button>
+
         
         </div>)} 
+
+        
+        {displaySchematics && (
+          <div>
+              {
+                    
+                    schematicImgs.map(
+                      (image, index) => <img key={index} src={image} alt={`image-${index}`} />
+                    )
+              }
+          </div>)}
+          
             <button
               onClick={changePhoto}
               style={{
