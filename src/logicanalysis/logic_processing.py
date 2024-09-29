@@ -6,12 +6,15 @@ def bind_rows(chip_coords, chip_info, middle):
     row_binds = {}
 
     # go through each list of chip coords to bind coords to pins
+    print(f"start: running bind_rows {chip_coords}")
     for chip_key in chip_coords:
+        print(f"running bind_rows {chip_key}")
         # get current chip
         curr_chip = chip_coords[chip_key]
 
         # get chip info for current chip using the chip name
         chip_name = curr_chip[0]
+        print(f"chip name = {chip_name}")
         curr_chip_info = chip_info[chip_name]
 
         # iterate through each coord in the chip
@@ -23,6 +26,7 @@ def bind_rows(chip_coords, chip_info, middle):
 
             # bind row_side to the pin+chip
             row_binds[row_side] = curr_chip_info[i] + "_" + chip_key
+        print(f"finished w {chip_key}")
 
             # print(f"{row_side} -> {row_binds[row_side]}")
     return row_binds
@@ -89,5 +93,8 @@ def create_relationships(endpoints, row_bindings, middle):
     return connections, inputs, outputs
 
 def process_logic(endpoints, chip_coords, chip_info, middle):
+    print("running process_logic")
     row_binds = bind_rows(chip_coords, chip_info, middle)
-    return create_relationships(endpoints, row_binds, middle) # returns connections, inputs, and outputs
+    print(row_binds)
+    relationships = create_relationships(endpoints, row_binds, middle) # returns connections, inputs, and outputs
+    return relationships

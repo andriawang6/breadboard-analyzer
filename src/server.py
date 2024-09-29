@@ -36,15 +36,20 @@ def upload_file():
             filename = secure_filename(file.filename)
             img_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             img.save(img_loc)
+            print("hi")
         
             #image processing
             chips, endpoints, cropped_img, chip_bounding = cvprocess.process_image(img_loc)
             imwrite(img_loc, cropped_img)
             session['img_loc'] = img_loc
             session['chips'] = chips
-            connections, inputs, outputs = logicanalysis.logic_processing.processlogic(endpoints, chips, datasheets.chip_info, 4.5)
+            print("tryin to run process logic")
+            print(datasheets.chip_info)
+            connections, inputs, outputs = logicanalysis.logic_processing.process_logic(endpoints, chips, datasheets.chip_info, 4.5)
+            print("tryin to run gen logic")
             expression = logicanalysis.logic_processing.generate_logic(connections, inputs, outputs, datasheets.chip_info, chips)
-            logicanalysis.logic_processing.gen_schematic(expression)
+            schem = logicanalysis.logic_processing.gen_schematic(expression)
+            print(schem)
 
         d['status'] = 1
 
@@ -64,14 +69,16 @@ def get_chips():
 def get_cropped_image():
     if 'img_loc' in session:
         return send_file(session['img_loc'])
-    return 0
+    return "bad"
 
 @app.route('/schematic', methods=['GET'])
 def get_schematic():
+    schematic_path = os.path.join(app.config['UPLOAD_FOLDER'], 'schematic_path')
     if 'schematic_path' in session:
-        return send_file(session['schematic_path'])
-    return 0
-
+        print('Found schematic!!!!!!!!!!!!')
+        return send_file(session['schematic_path'], mimetype='image/svg+xml')
+    print('womp womp')
+    return "bad"
 
 
 if __name__ == "__main__":

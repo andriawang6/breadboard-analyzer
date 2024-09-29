@@ -20,8 +20,8 @@ def gen_schematic(raw_expr):
     formatted_expr, output_label = reformat_expr(raw_expr)
     drawing = logicparse(formatted_expr, gateW=2.5, gateH=2, outlabel=output_label)
     # drawing.draw()
-    schematic_path = "schematic.svg"
-    drawing.save(schematic_path)
-    return schematic_path
+    schematic_path = "./static/schematic.svg"
+    # drawing.save(schematic_path)
+    return drawing.save(schematic_path)
 
 # gen_schematic("((A)'*(C)')'=B")
