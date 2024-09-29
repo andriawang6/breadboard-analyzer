@@ -5,3 +5,4 @@ opencv_python >= 4.9.0.80
 Pillow >= 10.4.0
 schemdraw >= 0.19
 Werkzeug >= 3.0.4
+flask_cors >= 4
