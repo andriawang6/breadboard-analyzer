@@ -12,6 +12,8 @@ import datasheets
 import logicanalysis.logic_processing
 import logicanalysis.generate_logic
 import logicanalysis.draw_schematic
+from schemdraw.parsing import logicparse
+
 
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -109,9 +111,20 @@ def get_SVG():
     print(f"generated {connections}")
     expression = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
     print(f"{expression}")
-    schematic = logicanalysis.draw_schematic.gen_schematic(expression)
-    session['svg_loc'] = schematic
-    return session['svg_loc']
+    # schematics = []
+    formatted = []
+    for expr in expression:
+        print(expr)
+        formatted.append((logicanalysis.draw_schematic.reformat_expr(expr)))
+        # schematics.append(schematic)
+    # session['svgs'] = schematics
+    # print(session['svgs'])
+    # return session['svgs']
+    
+    drawing = logicparse(formatted[0][0], gateW=2.5, gateH=2, outlabel=formatted[0][1])
+    drawing.draw()
+
+    return 0
     
 
 if __name__ == "__main__":
