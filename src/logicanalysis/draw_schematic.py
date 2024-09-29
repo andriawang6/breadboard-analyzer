@@ -24,4 +24,4 @@ def gen_schematic(raw_expr):
     return drawing.get_imagedata('svg')
 
 # res = gen_schematic("((A)'*(C)')'=B")
-# print(res)
+# print(res
