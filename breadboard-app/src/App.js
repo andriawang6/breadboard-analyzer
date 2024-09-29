@@ -6,12 +6,56 @@ import "./App.css"; // Ensure to import the CSS file if you're using one
 
 function App() {
   const [images, setImages] = useState([]);
+  const [chipPos, setChipPos] = useState([]);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
-  const [showUploadArea, setShowUploadArea] = useState(true);
+  const [appState, setAppState] = useState("upload"); //either upload, identifyChips, or viewSchematic
+  const [unknownChips, setUnknownChips] = useState([]);
+  const [chipTypes, setChipTypes] = useState([]);
 
   const onChange = (imageList) => {
     setImages(imageList);
   };
+
+  function handleChipSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
+    // Read the form data
+    const form = e.target;
+    const formData = new FormData(form);
+    setChipTypes(chipTypes.concat([formData.get("chips")]))
+    //chipTypes.push(formData.get("chips"))
+    setUnknownChips(unknownChips - 1)
+  }
+
+  const sendChipInfo = () => {
+    if(unknownChips === 0) {
+      const fd = new FormData();
+      fd.append("chips", JSON.stringify(chipTypes));
+      //POST request to send form info
+      fetch("/chipinfo", {
+        method: "POST",
+        body: fd,
+      })
+      .then((result) => result.json())
+      .then((data) => console.log(data));
+    }
+  }
+
+  const getChipLocations = () => {
+    fetch("/chips", {
+      method: "GET"
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`uh oh HTTP error! status: ${response.status}`);
+      }
+      return response.json()
+    })
+    .then((data) => {
+      setChipPos(data)
+      setUnknownChips(data.length)
+    });
+  }
 
   const getCroppedImage = () => {
     fetch("/croppedimage", {
@@ -26,7 +70,7 @@ function App() {
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         setCroppedImageUrl(url);
-        setShowUploadArea(false);
+        setAppState("identifyChips")
       })
       .catch((error) => {
         console.error("Failed to get cropped image:", error.message);
@@ -46,6 +90,9 @@ function App() {
         .then((data) => console.log(data))
         .then(() => {
           getCroppedImage();
+        })
+        .then(() => {
+          getChipLocations();
         });
     }
   };
@@ -53,7 +100,7 @@ function App() {
   const changePhoto = () => {
     // Reset image and show upload area again
     setImages([]);
-    setShowUploadArea(true);
+    setAppState("upload")
   };
 
   return (
@@ -111,7 +158,8 @@ function App() {
         />
       </div>
 
-      {showUploadArea && (
+      {/* Image upload box */}
+      {appState === "upload" && (
         <div
           style={{ maxWidth: "500px", margin: "0 auto", textAlign: "center" }}
         >
@@ -210,57 +258,72 @@ function App() {
         </div>
       )}
 
-      {!showUploadArea && (
-        <>
-          <div
-            style={{
-              marginTop: "20px",
-              maxWidth: "500px",
-              margin: "0 auto",
-              textAlign: "center",
-              padding: "20px",
-              borderRadius: "10px",
-              backgroundColor: "#ffffff",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "2px dashed #ccc",
-            }}
-          >
-            <h3 style={{ fontSize: "18px", color: "#524f4f" }}>
-              Cropped Image:
-            </h3>
-            <div
-              style={{
-                padding: "20px",
-                borderRadius: "10px",
-                backgroundColor: "#ffffff",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src={croppedImageUrl}
-                alt="Cropped"
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "300px",
-                  borderRadius: "10px",
-                  marginTop: "10px",
-                }}
-              />
-            </div>
-          </div>
+        {/* show cropped image */}
+      {appState === "identifyChips" && (
+        <div>
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h3 style={{ fontSize: "18px" }}>Cropped Image:</h3>
+        </div>
 
-          <div
+        {chipPos.length > 0 && ( 
+        <div>
+        {/* IMAGE CONTAINER */}
+        <div style = {{
+          position: "relative",
+          width: "100%", /* Adjust width as needed */
+          maxWidth: "300px" /* Optional: Set a maximum width */
+        }}>
+          <p>{chipPos[0]}</p>
+          <img
+            src={croppedImageUrl}
+            alt="Cropped"
             style={{
-              textAlign: "center",
-              marginTop: "20px",
+              width: "100%", /* Make bottom image responsive */
+              height: "auto" /* Maintain aspect ratio */
             }}
-          >
+          />
+          <img
+            src="static/pin_icon.svg"
+            style={{
+              position: "absolute",
+              top: `${chipPos[chipPos.length - unknownChips]-2}%`, /* Adjust this value to position the top image */
+              left: "50%", /* Center horizontally */
+              transform: "translateX(-50%)", /* Adjust to center the image */
+              width: "10%", /* Adjust width as needed */
+              height: "auto" /* Maintain aspect ratio */
+            }}
+          />
+        </div>
+        </div> )}
+{/* 
+        PROMPT USER */}
+        {unknownChips > 0 && (<div>
+          <p>{unknownChips}</p>
+          <p>What chip is this?</p>
+          <form onSubmit={handleChipSubmit}>
+            <select name="chips">
+              <option value="74HCT00">NAND (74HCT00)</option>
+              <option value="74HCT02">NOR (74HCT02)</option>
+              <option value="74HCT04">NOT (74HCT04)</option>
+              <option value="74HCT08">AND (74HCT08)</option>
+              <option value="74HCT32">OR (74HCT32)</option>
+              <option value="74HCT86">XOR (74HCT86)</option>
+            </select>
+            <button type="submit">Next</button>
+          </form>
+
+        </div>)}
+
+        {unknownChips === 0 && (<div>
+          <button type="button" onClick={sendChipInfo}>Submit</button>
+        </div>)} 
             <button
               onClick={changePhoto}
               style={{
@@ -275,7 +338,6 @@ function App() {
               Change Photo
             </button>
           </div>
-        </>
       )}
     </div>
   );

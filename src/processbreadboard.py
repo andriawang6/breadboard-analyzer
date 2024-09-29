@@ -243,15 +243,23 @@ def detect_chips(image):
     threshold_image = apply_threshold(filtered_image)
     contours, _ = cv2.findContours(threshold_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     im_shape = image.shape
+<<<<<<< HEAD
     rects = []
 
     chip_count = 1
+=======
+    chip_positions = []
+>>>>>>> webdev
     for c in contours:
         rect = cv2.boundingRect(c)
         #ignores too small or bounding the entire breadboard
         if rect[2] < 80 or rect[3] < 80 or (rect[2] * rect[3])/(image.shape[0] * image.shape[1]) > 0.9: continue
         x,y,w,h = rect
+<<<<<<< HEAD
         rects.append(rect)
+=======
+        chip_positions.append(((y+h/2)/im_shape[0])*100)
+>>>>>>> webdev
         #cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
 
         #assign
@@ -269,7 +277,11 @@ def detect_chips(image):
     # Show result
     # plt.imshow(image)
     # plt.show()
+<<<<<<< HEAD
     return chips, rects
+=======
+    return chips, chip_positions
+>>>>>>> webdev
 
 
 def detect_wires(image, side, min_width=20, max_width=100, min_length=200, max_length=10000):
