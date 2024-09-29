@@ -329,7 +329,8 @@ def process_image(image_path):
 
 
 # if __name__ == '__main__':
-#     breadboard_image = cv2.imread('../images/breadboard16.jpg')
+#     # crop_grids('./images/breadboardschem.png')
+#     breadboard_image = cv2.imread('./images/breadboardschem.png')
 #     cropped, left_crop, right_crop = crop_grids(breadboard_image)
     
 #     # Analyze both left and right crops and get wire endpoints

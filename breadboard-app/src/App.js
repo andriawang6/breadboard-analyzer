@@ -27,20 +27,6 @@ function App() {
     setUnknownChips(unknownChips - 1)
   }
 
-  const sendChipInfo = () => {
-    if(unknownChips === 0) {
-      const fd = new FormData();
-      fd.append("chips", JSON.stringify(chipTypes));
-      //POST request to send form info
-      fetch("/chipinfo", {
-        method: "POST",
-        body: fd,
-      })
-      .then((result) => result.json())
-      .then((data) => console.log(data));
-    }
-  }
-
   const getChipLocations = () => {
     fetch("/chips", {
       method: "GET"
@@ -96,6 +82,39 @@ function App() {
         });
     }
   };
+
+  const getSVG = () => {
+    fetch("/getSVG", {
+      method: "GET",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`svg: uh oh HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data)
+      });
+
+  }
+
+  const sendChipInfo = () => {
+    if(unknownChips === 0) {
+      const fd = new FormData();
+      fd.append("chips", JSON.stringify(chipTypes));
+      //POST request to send form info
+      fetch("/chipinfo", {
+        method: "POST",
+        body: fd,
+      })
+      .then((result) => result.json())
+      .then((data) => console.log(data))
+      .then(() => {
+        getSVG();
+      });
+    }
+  }
 
   const changePhoto = () => {
     // Reset image and show upload area again
@@ -339,6 +358,7 @@ function App() {
             </button>
           </div>
       )}
+      
     </div>
   );
 }

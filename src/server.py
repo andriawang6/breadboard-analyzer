@@ -7,6 +7,11 @@ from cv2 import imwrite
 
 import processbreadboard as cvprocess
 
+import datasheets
+import logicanalysis.logic_processing
+import logicanalysis.generate_logic
+import logicanalysis.draw_schematic
+
 UPLOAD_FOLDER = 'images'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
@@ -34,6 +39,8 @@ def upload_file():
             imwrite(img_loc, cropped_img)
             session['img_loc'] = img_loc
             session['chips'] = chip_bounding
+            session['chip_coords'] = chips
+            session['endpoints'] = endpoints
 
         d['status'] = 1
 
@@ -47,7 +54,15 @@ def upload_file():
 def update_chips():
     d= {}
     try:
-        print(request.form['chips'])
+        chip_types = request.form['chips'] #array of chip types in the correct order 
+        if not 'chip_coords' in session: return 0
+
+        #iterate through chip coords and update type
+        count = 0
+        for chip in session["chip_coords"]:
+            session["chip_coords"][chip][0] = chip_types[count]
+            count += 1
+
         d['status'] = 1
 
     except Exception as e:
@@ -66,6 +81,15 @@ def get_cropped_image():
     if 'img_loc' in session:
         return send_file(session['img_loc'])
     return 0
+
+@app.route('/getSVG', methods=['GET'])
+def get_SVG():
+    connections, inputs, outputs = logicanalysis.logic_processing.process_logic(session['endpoints'], session['chip_coords'], datasheets.chip_info, 4.5)
+    expression = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
+    schematic = logicanalysis.draw_schematic.gen_schematic(expression)
+    session['svg_loc'] = schematic
+    return session['svg_loc']
+    
 
 if __name__ == "__main__":
     app.secret_key = "My Secret key"
