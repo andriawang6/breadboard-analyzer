@@ -1,4 +1,5 @@
 from schemdraw.parsing import logicparse
+import os
 
 def reformat_expr(logic_expr):
     replace = { "*" : "&",
@@ -16,11 +17,15 @@ def reformat_expr(logic_expr):
     output_label = logic_expr[-1]
     return result, output_label
 
-def gen_schematic(raw_expr):
+def gen_schematic(raw_expr, i):
+    dir = "static/schematics"
+    #clear directory
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
+
     formatted_expr, output_label = reformat_expr(raw_expr)
     drawing = logicparse(formatted_expr, gateW=2.5, gateH=2, outlabel=output_label)
-    drawing.draw()
-    # drawing.save("schematic.svg")
-    # return drawing.get_imagedata('svg')
 
-# gen_schematic("((B*((D)'*C)')')=A")
+    drawing.save(f"static/schematics/schematic{i}.svg")    
+
+

@@ -109,22 +109,13 @@ def get_SVG():
     print(f"checking chip_coords: {session['updated_chip_coords']}")
     connections, inputs, outputs = logicanalysis.logic_processing.process_logic(session['endpoints'], session['chip_coords'], datasheets.chip_info, 4.5)
     print(f"generated {connections}")
-    expression = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
-    print(f"{expression}")
-    # schematics = []
-    formatted = []
-    for expr in expression:
-        print(expr)
-        formatted.append((logicanalysis.draw_schematic.reformat_expr(expr)))
-        # schematics.append(schematic)
-    # session['svgs'] = schematics
-    # print(session['svgs'])
-    # return session['svgs']
+    expressions = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
+    #expressions.append("A=B")
     
-    drawing = logicparse(formatted[0][0], gateW=2.5, gateH=2, outlabel=formatted[0][1])
-    drawing.draw()
+    for i, expr in enumerate(expressions):
+        logicanalysis.draw_schematic.gen_schematic(expr, i)
 
-    return 0
+    return jsonify(1)
     
 
 if __name__ == "__main__":
