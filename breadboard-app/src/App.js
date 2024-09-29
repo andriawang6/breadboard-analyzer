@@ -38,6 +38,9 @@ function App() {
       })
       .then((result) => result.json())
       .then((data) => console.log(data));
+      // for (var pair of fd.entries()) {
+      //   console.log(pair[0]+ ', ' + pair[1]); 
+      // } 
     }
   }
 
@@ -263,13 +266,22 @@ function App() {
         <div>
         <div
           style={{
-            marginTop: "20px",
+            marginTop: "5px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <h3 style={{ fontSize: "18px" }}>Cropped Image:</h3>
+          <p
+            style={{
+              textAlign: "center",
+              padding: "5px",
+              color: "#524f4f",
+              fontsize: "18 px"
+            }}
+          >
+            Cropped Image
+          </p>
         </div>
 
         {chipPos.length > 0 && ( 
@@ -278,15 +290,20 @@ function App() {
         <div style = {{
           position: "relative",
           width: "100%", /* Adjust width as needed */
-          maxWidth: "300px" /* Optional: Set a maximum width */
+          maxWidth: "200px" /* Optional: Set a maximum width */,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "0 auto"
         }}>
-          <p>{chipPos[0]}</p>
           <img
             src={croppedImageUrl}
             alt="Cropped"
             style={{
               width: "100%", /* Make bottom image responsive */
-              height: "auto" /* Maintain aspect ratio */
+              height: "auto", /* Maintain aspect ratio */
+              display: "block"
             }}
           />
           <img
@@ -296,7 +313,7 @@ function App() {
               top: `${chipPos[chipPos.length - unknownChips]-2}%`, /* Adjust this value to position the top image */
               left: "50%", /* Center horizontally */
               transform: "translateX(-50%)", /* Adjust to center the image */
-              width: "10%", /* Adjust width as needed */
+              width: "15%", /* Adjust width as needed */
               height: "auto" /* Maintain aspect ratio */
             }}
           />
@@ -304,11 +321,21 @@ function App() {
         </div> )}
 {/* 
         PROMPT USER */}
-        {unknownChips > 0 && (<div>
-          <p>{unknownChips}</p>
-          <p>What chip is this?</p>
-          <form onSubmit={handleChipSubmit}>
-            <select name="chips">
+        {unknownChips > 0 && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px 0" }}>
+          <p
+            style={{
+              textAlign: "center",
+              padding: "5px",
+              marginTop: "-12px",
+              marginRight: "10px",
+              color: "#524f4f"
+            }}
+          >
+          What chip is this?
+          </p>
+
+          <form onSubmit={handleChipSubmit} style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <select name="chips" style={{ marginRight: "10px", padding: "5px"}}>
               <option value="74HCT00">NAND (74HCT00)</option>
               <option value="74HCT02">NOR (74HCT02)</option>
               <option value="74HCT04">NOT (74HCT04)</option>
@@ -316,13 +343,41 @@ function App() {
               <option value="74HCT32">OR (74HCT32)</option>
               <option value="74HCT86">XOR (74HCT86)</option>
             </select>
-            <button type="submit">Next</button>
+
+            <button 
+              type="submit"
+              style={{
+                marginTop: "0",
+                marginBottom: "100 px",
+                padding: "5px 20px",
+                borderRadius: "5px",
+                border: "none",
+                backgroundColor: "#ab7d58",
+                color: "white",
+                cursor: "pointer",
+              }} 
+            >
+              Next Chip
+            </button>
           </form>
 
         </div>)}
 
-        {unknownChips === 0 && (<div>
-          <button type="button" onClick={sendChipInfo}>Submit</button>
+        {unknownChips === 0 && (<div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", margin: "20px" }}>
+          <button type="button" onClick={sendChipInfo} 
+            style={{
+              marginTop: "0",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                  border: "none",
+                  backgroundColor: "#ab7d58",
+                  color: "white",
+                  cursor: "pointer",
+            }}
+          >
+            Submit
+          </button>
+        
         </div>)} 
             <button
               onClick={changePhoto}
