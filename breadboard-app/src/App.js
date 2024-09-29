@@ -102,7 +102,7 @@ function App() {
   const sendChipInfo = () => {
     if(unknownChips === 0) {
       const fd = new FormData();
-      fd.append("chips", JSON.stringify(chipTypes));
+      fd.append("chips", JSON.parse(JSON.stringify(chipTypes)));
       //POST request to send form info
       fetch("/chipinfo", {
         method: "POST",

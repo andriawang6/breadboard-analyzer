@@ -4,6 +4,7 @@ from PIL import Image
 from flask import Flask, jsonify, request, send_file, session
 from werkzeug.utils import secure_filename
 from cv2 import imwrite
+import json
 
 import processbreadboard as cvprocess
 
@@ -41,6 +42,21 @@ def upload_file():
             session['chips'] = chip_bounding
             session['chip_coords'] = chips
             session['endpoints'] = endpoints
+            
+            # reprocess session['endpoints'] to delete garbage data
+            prev = ()
+            res = []
+            for endpoint in session['endpoints']:
+                if endpoint[0] == endpoint[1]:
+                    continue
+                if endpoint == prev:
+                    continue
+                prev = endpoint
+                res.append(endpoint)
+            session['endpoints'] = res
+
+
+
 
         d['status'] = 1
 
@@ -55,6 +71,8 @@ def update_chips():
     d= {}
     try:
         chip_types = request.form['chips'] #array of chip types in the correct order 
+        chip_types = chip_types.split(",")
+
         if not 'chip_coords' in session: return 0
 
         #iterate through chip coords and update type
@@ -62,11 +80,12 @@ def update_chips():
         for chip in session["chip_coords"]:
             session["chip_coords"][chip][0] = chip_types[count]
             count += 1
-
+        print(f"chip coords now processed: {session['chip_coords']}")
+        session['updated_chip_coords'] = session['chip_coords']
         d['status'] = 1
 
     except Exception as e:
-        print(f"Couldn't update chip data")
+        print(f"Couldn't update chip data {e}")
         d['status'] = 0
     return jsonify(d)
 
@@ -84,8 +103,12 @@ def get_cropped_image():
 
 @app.route('/getSVG', methods=['GET'])
 def get_SVG():
+    print(f"checking endpoints: {session['endpoints']}")
+    print(f"checking chip_coords: {session['updated_chip_coords']}")
     connections, inputs, outputs = logicanalysis.logic_processing.process_logic(session['endpoints'], session['chip_coords'], datasheets.chip_info, 4.5)
+    print(f"generated {connections}")
     expression = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
+    print(f"{expression}")
     schematic = logicanalysis.draw_schematic.gen_schematic(expression)
     session['svg_loc'] = schematic
     return session['svg_loc']

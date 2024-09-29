@@ -296,7 +296,7 @@ def detect_wires(image, side, min_width=20, max_width=100, min_length=200, max_l
         length = cv2.arcLength(c, True)
         
         # Check for bounding box dimensions and contour length
-        if min_width <= w <= max_width and min_length <= length <= max_length:
+        if min_width <= w <= max_width and min_length <= h <= max_length:
             #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
             #handles left and right side coords
