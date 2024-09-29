@@ -108,8 +108,6 @@ def get_SVG():
     connections, inputs, outputs = logicanalysis.logic_processing.process_logic(session['endpoints'], session['chip_coords'], datasheets.chip_info, 4.5)
     print(f"generated {connections}")
     expressions = logicanalysis.generate_logic.generate_logic(connections, inputs, outputs, datasheets.chip_info, session['chip_coords'])
-    expressions.append("A&B=C")
-    expressions.append("A+B=C")
 
     dir = "static/schematics"
     #clear directory

@@ -158,7 +158,7 @@ function App() {
           color: "#524f4f",
         }}
       >
-        BreadBoard Bakery
+        Breadboard Bakery
       </div>
 
       <div
@@ -336,6 +336,7 @@ function App() {
               display: "block"
             }}
           />
+          {unknownChips > 0 && (
           <img
             src="static/pin_icon.svg"
             style={{
@@ -346,7 +347,7 @@ function App() {
               width: "15%", /* Adjust width as needed */
               height: "auto" /* Maintain aspect ratio */
             }}
-          />
+          /> )}
         </div>
         </div> )}
 {/* 
@@ -363,7 +364,7 @@ function App() {
           >
           What chip is this?
           </p>
-
+          
           <form onSubmit={handleChipSubmit} style={{ display: "flex", alignItems: "center", justifyContent: "center"}}>
             <select name="chips" style={{ marginRight: "10px", padding: "5px"}}>
               <option value="74HCT00">NAND (74HCT00)</option>

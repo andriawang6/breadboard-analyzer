@@ -82,7 +82,7 @@ def detect_corners_from_contour(canvas, cnt):
         cv2.putText(canvas, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
 
     # Rearranging the order of the corner points
-    approx_corners = [approx_corners[i] for i in [1, 3, 0, 2]]
+    approx_corners = [approx_corners[i] for i in [0, 2, 1, 3]]
 
     # plt.imshow(canvas)
     # plt.title('Corner Points: Douglas-Peucker')
@@ -297,7 +297,7 @@ def detect_wires(image, side, min_width=20, max_width=100, min_length=200, max_l
         
         # Check for bounding box dimensions and contour length
         if min_width <= w <= max_width and min_length <= h <= max_length:
-            #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            #cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 3)
 
             #handles left and right side coords
             offset = 5 if side == "right" else 0
