@@ -13,10 +13,6 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# @app.route('/')
-# def home():
-#     store = 
-#     session['store'] = store
 
 @app.route('/image', methods=['POST'])
 def upload_file():
@@ -37,7 +33,7 @@ def upload_file():
             chips, endpoints, cropped_img, chip_bounding = cvprocess.process_image(img_loc)
             imwrite(img_loc, cropped_img)
             session['img_loc'] = img_loc
-            session['chips'] = chips
+            session['chips'] = chip_bounding
 
         d['status'] = 1
 
@@ -47,18 +43,29 @@ def upload_file():
 
     return jsonify(d)
 
+@app.route('/chipinfo', methods=['POST'])
+def update_chips():
+    d= {}
+    try:
+        print(request.form['chips'])
+        d['status'] = 1
+
+    except Exception as e:
+        print(f"Couldn't update chip data")
+        d['status'] = 0
+    return jsonify(d)
+
 @app.route('/chips', methods=['GET'])
 def get_chips():
     if 'chips' in session:
-        return session['chips']
-    return "bad"
+        return jsonify(session['chips'])
+    return 0
 
 @app.route('/croppedimage', methods=['GET'])
 def get_cropped_image():
     if 'img_loc' in session:
         return send_file(session['img_loc'])
     return 0
-
 
 if __name__ == "__main__":
     app.secret_key = "My Secret key"
