@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ImageUploading from "react-images-uploading";
 import { IoMdPhotos } from "react-icons/io";
 import "./fonts/superbakery.ttf";
@@ -40,32 +40,22 @@ function App() {
       .then((response) => {
         if (!response.ok) {
           throw new Error(
-            `Failed to fetch schematic image, status: ${response.status}`
+            `uh ohFailed to fetch schematic image, status: ${response.status}`
           );
         }
         return response.blob();
       })
       .then((blob) => {
-        console.log(blob);
-        return blob.text();
-      })
-      .then((text) => {
-        console.log(text);
+        // console.log(blob)
+        const url = URL.createObjectURL(blob);
+        // console.log(url)
+        setSchematicImageUrl(url);
       })
       .catch((error) => {
-        console.error("Failed to get schematic image:", error);
-        alert("Error fetching schematic image. Please try again.");
+        console.error("uh oh Failed to get schematic image:", error);
+        alert("uh oh Error fetching schematic image. Please try again.");
       });
   };
-
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (schematicImageUrl) {
-        URL.revokeObjectURL(schematicImageUrl);
-      }
-    };
-  }, [schematicImageUrl]);
 
   const imageUpload = () => {
     if (images.length > 0) {
